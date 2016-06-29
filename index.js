@@ -9,7 +9,7 @@ function observer (target) {
   let updateCount = 0;
 
   target.render = (component, setState) => {
-    let result;
+    let baseRender = _render(component, setState);
     if (unsubscriber) {
       unsubscriber();
     }
@@ -20,12 +20,11 @@ function observer (target) {
         return component.props.state.counter
       },
       (counter) => {
-        console.log('render');
-        result = _render(component, setState);
+        _render(component, setState)
         setState({ __updates: updateCount++ });
     });
-    result = _render(component, setState);
-    return result;
+
+    return baseRender;
   };
 
   target.beforeUnmount = (component, el) => {
