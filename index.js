@@ -1,4 +1,4 @@
-import {autorun} from 'mobx';
+import {reaction} from 'mobx';
 
 exports.observer = observer;
 
@@ -13,10 +13,18 @@ function observer (target) {
     if (unsubscriber) {
       unsubscriber();
     }
-    unsubscriber = autorun(() => {
-      result = _render(component, setState);
-      setState({ __updates: updateCount++ });
+
+    unsubscriber = reaction(
+      () => {
+        console.log(component.props.state);
+        return component.props.state.counter
+      },
+      (counter) => {
+        console.log('render');
+        result = _render(component, setState);
+        setState({ __updates: updateCount++ });
     });
+    result = _render(component, setState);
     return result;
   };
 
