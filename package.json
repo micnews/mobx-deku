@@ -7,6 +7,7 @@
     "test": "ava test/test.js --verbose && semistandard | snazzy",
     "clean": "rm -rf lib",
     "build": "babel index.js --out-dir lib",
+    "watch": "babel index.js -w --out-dir lib",
     "prepublish": "npm run clean && npm run build"
   },
   "repository": {
@@ -51,6 +52,7 @@
     "babel": "inherit"
   },
   "semistandard": {
-    "parser": "babel-eslint"
+    "parser": "babel-eslint",
+    "ignore": "/lib"
   }
 }

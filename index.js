@@ -14,15 +14,30 @@ function observer (target) {
       unsubscriber();
     }
 
+    // Get all of the mobx stores from props
+    const stores = Object.keys(component.props).map((prop) => {
+      const property = component.props[prop];
+      if (typeof property === 'object' && property.hasOwnProperty('$mobx')) {
+        return property;
+      }
+    }).filter((prop) => prop);
+
     unsubscriber = reaction(
       () => {
-        console.log(component.props.state);
-        return component.props.state.counter
+        // Extract the obvserables
+        const observables = stores.map((store) => {
+          if (!store) return {};
+          Object.keys(store).map((prop) => {
+            return store[prop];
+          });
+        });
+        return observables;
       },
-      (counter) => {
-        _render(component, setState)
+      (observables) => {
+        _render(component, setState);
         setState({ __updates: updateCount++ });
-    });
+      })
+    ;
 
     return baseRender;
   };
