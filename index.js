@@ -1,4 +1,4 @@
-import {autorun} from 'mobx';
+import {reaction} from 'mobx';
 
 exports.observer = observer;
 
@@ -9,15 +9,37 @@ function observer (target) {
   let updateCount = 0;
 
   target.render = (component, setState) => {
-    let result;
+    let baseRender = _render(component, setState);
     if (unsubscriber) {
       unsubscriber();
     }
-    unsubscriber = autorun(() => {
-      result = _render(component, setState);
-      setState({ __updates: updateCount++ });
-    });
-    return result;
+
+    // Get all of the mobx stores from props
+    const stores = Object.keys(component.props).map((prop) => {
+      const property = component.props[prop];
+      if (typeof property === 'object' && property.hasOwnProperty('$mobx')) {
+        return property;
+      }
+    }).filter((prop) => prop);
+
+    unsubscriber = reaction(
+      () => {
+        // Extract the obvserables
+        const observables = stores.map((store) => {
+          if (!store) return {};
+          Object.keys(store).map((prop) => {
+            return store[prop];
+          });
+        });
+        return observables;
+      },
+      (observables) => {
+        _render(component, setState);
+        setState({ __updates: updateCount++ });
+      })
+    ;
+
+    return baseRender;
   };
 
   target.beforeUnmount = (component, el) => {
