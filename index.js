@@ -24,7 +24,7 @@ function observer (target) {
 
     unsubscriber = reaction(
       () => {
-        // Extract the obvserables
+        // Extract the observables
         const observables = stores.map((store) => {
           if (!store) return {};
           Object.keys(store).map((prop) => {
