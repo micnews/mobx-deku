@@ -28,21 +28,27 @@ function observer (target) {
         const observables = stores.map((store) => {
           if (!store) return {};
           return Object.keys(store).map((prop) => {
-            if (typeof store[prop] === 'object') {
-              const obj = toJS(store[prop]);
-              // If its an array, make all objects inside observable
-              if (Array.isArray(obj)) {
-                return obj.map((obj) => {
-                  return Object.keys(obj).map((x) => x);
-                });
-              }
-              // If its a regular object, make all props of the object observable
-              return Object.keys(obj).map((x) => x);
-            }
-            return store[prop];
-          });
-        }).reduce((a, b) => a.concat(b));
+            // if (!store[prop]) return;
+            const property = store[prop];
+            console.log('AHHH', property);
+            const something = toJS(store[prop]);
+            console.log('fuck!', something);
 
+            // if (typeof store[prop] === 'object') {
+            //   const obj = toJS(store[prop]);
+            //   console.log(obj)
+            //   // If its an array, make all objects inside observable
+            //   if (Array.isArray(obj)) {
+            //     return obj.map((obj) => {
+            //       return Object.keys(obj).map((x) => x);
+            //     });
+            //   }
+            //   // If its a regular object, make all props of the object observable
+            //   return Object.keys(obj).map((x) => x);
+            // }
+            // return store[prop];
+          });
+        });
         return observables;
       },
       (observables) => {

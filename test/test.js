@@ -22,18 +22,21 @@ class AppState3 {
   @observable bool = false;
   @observable objectOne = {
     id: 42,
-    something: 'ok!'
+    something: 'ok!',
+    somethingElse: null
   }
   @observable simpleArray = [1, 2, 3];
   @observable todos = [{
     title: 'test',
     id: 1,
-    completed: false
+    completed: false,
+    something: null
   },
   {
     title: 'test2',
     id: 2,
-    completed: false
+    completed: false,
+    something: null
   }];
 
   @action completeTodo (index) {
