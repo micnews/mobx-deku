@@ -19,6 +19,12 @@ class AppState2 {
 }
 
 class AppState3 {
+  @observable bool = false;
+  @observable objectOne = {
+    id: 42,
+    something: 'ok!'
+  }
+  @observable simpleArray = [1, 2, 3];
   @observable todos = [{
     title: 'test',
     id: 1,
@@ -46,12 +52,24 @@ const App = observer({
         <div class='app'>{props.appState.counter}</div>
         <div class='app2'>{props.appState2.counter}</div>
         <div class='app3'>
-          {props.appState3.todos.map((todo) => {
-            return (<div>{todo.title}<span>{todo.id}</span></div>);
+          <div class='simpleArray'>{props.appState3.simpleArray[0]}</div>
+          <div class='objectExample'>{props.appState3.objectOne.id}</div>
+          {props.appState3.todos.map((todo, index) => {
+            return (
+              <div class={{'completed': todo.completed, todo: true}}>
+                {todo.title}<span>{todo.id}</span>
+                <button onClick={onClick(index)}></button>
+              </div>
+            );
           })}
         </div>
       </div>
     );
+    function onClick (index) {
+      return function () {
+        props.appState3.completeTodo(index);
+      };
+    }
   }
 });
 
@@ -98,8 +116,22 @@ test.cb('Todo list gets rendered', (t) => {
   appState3.todos[0].title = 'New Title';
   appState3.todos[0].id = 20;
 
+  t.is($app.querySelector('.simpleArray').innerHTML, '1');
+
   setTimeout(() => {
-    t.is($app.querySelector('div').textContent, 'New Title20');
-    t.end();
+    t.is($app.querySelector('.todo').textContent, 'New Title20');
+    $app.querySelector('button').click();
+  });
+
+  setTimeout(() => {
+    t.is($app.querySelector('.todo').className, 'completed todo');
+    appState3.objectOne.id = 'it worked!';
+    appState3.simpleArray[0] = 42;
   }, 100);
+
+  setTimeout(() => {
+    t.is($app.querySelector('.objectExample').innerHTML, 'it worked!');
+    t.is($app.querySelector('.simpleArray').innerHTML, '42');
+    t.end();
+  }, 200);
 });

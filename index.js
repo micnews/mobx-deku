@@ -1,4 +1,4 @@
-import {reaction} from 'mobx';
+import {reaction, toJS} from 'mobx';
 
 exports.observer = observer;
 
@@ -27,10 +27,22 @@ function observer (target) {
         // Extract the observables
         const observables = stores.map((store) => {
           if (!store) return {};
-          Object.keys(store).map((prop) => {
+          return Object.keys(store).map((prop) => {
+            if (typeof store[prop] === 'object') {
+              const obj = toJS(store[prop]);
+              // If its an array, make all objects inside observable
+              if (Array.isArray(obj)) {
+                return obj.map((obj) => {
+                  return Object.keys(obj).map((x) => x);
+                });
+              }
+              // If its a regular object, make all props of the object observable
+              return Object.keys(obj).map((x) => x);
+            }
             return store[prop];
           });
-        });
+        }).reduce((a, b) => a.concat(b));
+
         return observables;
       },
       (observables) => {
